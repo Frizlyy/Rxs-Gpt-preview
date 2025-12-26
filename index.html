@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Preview RxS-GPT | Features & Pricing</title>
+    
+    <!-- Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===== VARIABLES ===== */
+        :root {
+            --bg-body: #000000;
+            --card-bg: #0f0f0f;
+            --primary: #FF4D00;
+            --primary-glow: rgba(255, 77, 0, 0.4);
+            --gold: #FFD700;
+            --green-matrix: #00ff41;
+            --text-white: #ffffff;
+            --text-grey: #888888;
+            --font-main: 'Outfit', sans-serif;
+            --font-logo: 'Orbitron', sans-serif;
+            --font-premium: 'Bebas Neue', sans-serif;
+        }
+
+        /* ===== RESET ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-white);
+            font-family: var(--font-main);
+            width: 100vw;
+            overflow-x: hidden;
+            padding-bottom: 50px;
+        }
+
+        /* ===== LOADING SCREEN ===== */
+        .loading-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 9999;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            transition: opacity 0.8s ease;
+        }
+        .loading-logo { 
+            font-size: 32px; font-weight: 900; letter-spacing: 2px; 
+            margin-bottom: 20px; font-family: var(--font-logo); 
+            text-transform: uppercase; color: #fff;
+        }
+        .loading-logo span { color: var(--primary); }
+        .fingerprint-svg {
+            width: 80px; height: 80px; stroke: var(--primary); fill: none; stroke-width: 1.5;
+            stroke-dasharray: 1000; stroke-dashoffset: 1000; 
+            animation: dash 3s ease-in-out forwards infinite alternate;
+            filter: drop-shadow(0 0 15px var(--primary-glow));
+        }
+        @keyframes dash { to { stroke-dashoffset: 0; } }
+
+        /* ===== HEADER ===== */
+        .preview-header {
+            padding: 40px 20px 20px 20px;
+            text-align: center;
+        }
+
+        /* GLITCH EFFECT */
+        .glitch-title {
+            font-family: var(--font-logo);
+            font-size: 36px;
+            font-weight: 900;
+            position: relative;
+            color: #fff;
+            letter-spacing: 2px;
+        }
+        .glitch-title::before, .glitch-title::after {
+            content: attr(data-text);
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        }
+        .glitch-title::before {
+            left: 2px; text-shadow: -1px 0 #ff00c1; clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+        .glitch-title::after {
+            left: -2px; text-shadow: -1px 0 #00fff9; clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+        @keyframes glitch-anim {
+            0% { clip: rect(30px, 9999px, 10px, 0); }
+            5% { clip: rect(80px, 9999px, 90px, 0); }
+            10% { clip: rect(10px, 9999px, 40px, 0); }
+            100% { clip: rect(50px, 9999px, 20px, 0); }
+        }
+        @keyframes glitch-anim2 {
+            0% { clip: rect(60px, 9999px, 80px, 0); }
+            20% { clip: rect(10px, 9999px, 5px, 0); }
+            100% { clip: rect(90px, 9999px, 100px, 0); }
+        }
+
+        .subtitle {
+            color: var(--text-grey);
+            font-size: 14px;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+
+        /* ===== GRID LAYOUT ===== */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* ===== CARD STYLE ===== */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid #222;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            opacity: 0; /* Hidden by default for animation */
+        }
+
+        /* Animation States */
+        .card.scroll-hidden-down { transform: translateY(50px); opacity: 0; }
+        .card.scroll-hidden-up { transform: translateY(-50px); opacity: 0; }
+        .card.visible { transform: translateY(0); opacity: 1; }
+
+        .card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(255, 77, 0, 0.15);
+            transform: scale(1.02);
+            z-index: 2;
+        }
+
+        .card-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: var(--primary);
+            background: rgba(255, 77, 0, 0.1);
+            width: 60px; height: 60px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        .card:hover .card-icon {
+            background: var(--primary);
+            color: #000;
+            transform: rotateY(180deg);
+        }
+
+        .card-title {
+            font-family: var(--font-logo);
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .card-desc {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            flex-grow: 1;
+        }
+
+        .btn-detail {
+            background: transparent;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 8px 16px;
+            font-size: 11px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        .btn-detail:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        /* ===== SPECIAL CARDS ===== */
+        
+        /* 1. DOWNLOAD CARD */
+        .card.download-card {
+            grid-column: span 2; /* Full width */
+            background: linear-gradient(135deg, #051a05, #000);
+            border: 1px solid var(--green-matrix);
+            margin-top: 20px;
+        }
+        .card.download-card .card-icon {
+            color: var(--green-matrix);
+            background: rgba(0, 255, 65, 0.1);
+        }
+        .card.download-card:hover {
+            box-shadow: 0 0 25px rgba(0, 255, 65, 0.3);
+        }
+        .btn-download {
+            background: var(--green-matrix);
+            color: #000;
+            border: none;
+            width: 100%;
+            padding: 15px;
+            font-family: var(--font-premium);
+            font-size: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+        .btn-download:active { transform: scale(0.95); }
+
+        /* 2. PREMIUM CARD */
+        .card.premium-card {
+            grid-column: span 2;
+            background: linear-gradient(135deg, #1a1500, #000);
+            border: 1px solid var(--gold);
+            position: relative;
+        }
+        .premium-badge {
+            position: absolute; top: 10px; right: 10px;
+            background: var(--gold); color: #000;
+            padding: 2px 8px; font-size: 10px; font-weight: 900;
+            border-radius: 4px;
+        }
+        .price-tag {
+            font-family: var(--font-premium);
+            font-size: 42px;
+            color: var(--gold);
+            margin: 10px 0;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        .price-period { font-size: 14px; color: #888; font-family: var(--font-main); }
+        
+        .feature-list {
+            list-style: none;
+            text-align: left;
+            width: 100%;
+            margin: 15px 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #222;
+            color: #ccc;
+            font-size: 13px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .feature-list li i { color: var(--gold); }
+        
+        .btn-buy {
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+            color: #000;
+            width: 100%;
+            padding: 15px;
+            font-weight: 900;
+            font-family: var(--font-premium);
+            font-size: 20px;
+            border: none; border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            animation: pulse-gold 2s infinite;
+        }
+        @keyframes pulse-gold {
+            0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #444;
+            margin-top: 30px;
+            padding: 20px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-logo">PREVIEW <span>RXS-GPT!</span></div>
+        <svg class="fingerprint-svg" viewBox="0 0 24 24">
+            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z" />
+        </svg>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="preview-header">
+        <div class="glitch-title" data-text="RXS-GPT V3.0">RXS-GPT V3.0</div>
+        <div class="subtitle">THE ULTIMATE AI NO SENSOR</div>
+        <svg class="fingerprint-svg" style="width: 50px; height: 50px; margin-top: 15px;" viewBox="0 0 24 24">
+            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z" />
+        </svg>
+    </div>
+
+    <div class="grid-container">
+        
+        <!-- CARD 1 -->
+        <div class="card">
+            <div class="card-icon"><i class="fas fa-eye-slash"></i></div>
+            <div class="card-title">NO SENSOR</div>
+            <div class="card-desc">Mode tanpa sensor. Menjawab pertanyaan brutal tanpa batasan kebijakan AI.</div>
+            <button class="btn-detail" onclick="showInfo('No Sensor Mode')">INFO</button>
+        </div>
+
+        <!-- CARD 2 -->
+        <div class="card">
+            <div class="card-icon"><i class="fas fa-code"></i></div>
+            <div class="card-title">AUTO CODE</div>
+            <div class="card-desc">Generate script hacking & tools dalam 10+ bahasa pemrograman.</div>
+            <button class="btn-detail" onclick="showInfo('Auto Code Gen')">INFO</button>
+        </div>
+
+        <!-- CARD 3 -->
+        <div class="card">
+            <div class="card-icon"><i class="fas fa-biohazard"></i></div>
+            <div class="card-title">JAILBREAK</div>
+            <div class="card-desc">Prompt maker kostum dngan nama mu sendiri!</div>
+            <button class="btn-detail" onclick="showInfo('Jailbreak Maker')">INFO</button>
+        </div>
+
+        <!-- CARD 4 -->
+        <div class="card">
+            <div class="card-icon"><i class="fas fa-file-contract"></i></div>
+            <div class="card-title">FILE ANALYZER</div>
+            <div class="card-desc">Upload script/log dan minta AI untuk analisa atau perbaiki bug.</div>
+            <button class="btn-detail" onclick="showInfo('File Analyzer')">INFO</button>
+        </div>
+
+        <!-- CARD 5 -->
+        <div class="card">
+            <div class="card-icon"><i class="fas fa-bolt"></i></div>
+            <div class="card-title">FAST</div>
+            <div class="card-desc">Response time tergantung kecepatan server</div>
+            <button class="btn-detail" onclick="showInfo('High Speed')">INFO</button>
+        </div>
+
+        <!-- CARD 6 -->
+        <div class="card">
+            <div class="card-icon"><i class="fas fa-user-secret"></i></div>
+            <div class="card-title">ANONYMOUS</div>
+            <div class="card-desc">Tidak ada log chat yang disimpan di server. Privasi total 100%.</div>
+            <button class="btn-detail" onclick="showInfo('Privacy')">INFO</button>
+        </div>
+
+        <!-- DOWNLOAD CARD -->
+        <div class="card download-card">
+            <div class="card-icon"><i class="fab fa-android"></i></div>
+            <div class="card-title">DOWNLOAD APK</div>
+            <div class="card-desc">Download aplikasi, supaya kamu mendapatkan akses free!</div>
+            <!-- Link Download Dummy -->
+            <a href="https://reliable-flan-edde01.netlify.app/" class="btn-download">
+                <i class="fas fa-download"></i> DOWNLOAD FREE
+            </a>
+        </div>
+
+        <!-- PREMIUM CARD -->
+        <div class="card premium-card">
+            <div class="premium-badge">BEST VALUE</div>
+            <div class="card-icon" style="color:gold; background: rgba(255, 215, 0, 0.1);"><i class="fas fa-crown"></i></div>
+            <div class="card-title" style="color:gold; font-size: 24px;">LIFETIME ACCESS</div>
+            
+            <div class="price-tag">30K <span class="price-period">/ SELAMANYA</span></div>
+
+            <ul class="feature-list">
+                <li><i class="fas fa-check-circle"></i> Unlimited Chat Tanpa Batas</li>
+                <li><i class="fas fa-check-circle"></i> Akses pro untuk project yang lainnya</li>
+                <li><i class="fas fa-check-circle"></i> Upload file tanpa batas</li>
+                <li><i class="fas fa-check-circle"></i> Upload File Ukuran Besar</li>
+                <li><i class="fas fa-check-circle"></i> Akses masuk grup murid jailbreak dan lainnya gratis!</li>
+            </ul>
+
+            <!-- Link Pembelian Dummy (Ganti href dengan link WA/Payment Gateway) -->
+            <a href="https://gleeful-tartufo-98ef28.netlify.app/" target="_blank" class="btn-buy">
+                <i class="fas fa-shopping-cart"></i> BELI SEKARANG
+            </a>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        &copy; 2025 Fenerixs Development. All Rights Reserved.
+    </div>
+
+    <script>
+        // LOADING SCREEN
+        window.onload = () => {
+            const screen = document.getElementById('loadingScreen');
+            setTimeout(() => {
+                screen.style.opacity = '0';
+                setTimeout(() => screen.style.display = 'none', 800);
+            }, 1500);
+        };
+
+        // SCROLL ANIMATION LOGIC (FADE IN/OUT + DIRECTION)
+        let lastScrollTop = 0;
+        const cards = document.querySelectorAll('.card');
+
+        // Initial setup for Observer
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.15 // Trigger when 15% visible
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            const st = window.pageYOffset || document.documentElement.scrollTop;
+            const isScrollingDown = st > lastScrollTop;
+            
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Item Masuk Layar
+                    entry.target.classList.remove('scroll-hidden-down', 'scroll-hidden-up');
+                    entry.target.classList.add('visible');
+                } else {
+                    // Item Keluar Layar
+                    entry.target.classList.remove('visible');
+                    
+                    // Tentukan arah animasi keluar/masuk selanjutnya
+                    if (entry.boundingClientRect.top > 0) {
+                        // Element berada di bawah viewport
+                        entry.target.classList.add('scroll-hidden-down');
+                    } else {
+                        // Element berada di atas viewport
+                        entry.target.classList.add('scroll-hidden-up');
+                    }
+                }
+            });
+            
+            lastScrollTop = st <= 0 ? 0 : st;
+        }, observerOptions);
+
+        // Observe all cards
+        cards.forEach(card => {
+            card.classList.add('scroll-hidden-down'); // Initial state
+            observer.observe(card);
+        });
+
+        // Simple Info Alert
+        function showInfo(feature) {
+            alert(`Fitur [${feature}] adalah core sistem dari RxS-GPT yang memungkinkan bypassing filter standar.`);
+        }
+
+    </script>
+</body>
+</html>
